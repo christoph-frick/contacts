@@ -1,6 +1,6 @@
 # contacts
 
-Contact list technical study for [Om](https://github.com/omcljs/om) next.
+Contact list technical study for [Om](https://github.com/omcljs/om) Next.
 
 This is a simple technical study inspired by
 [David Nolen](http://swannodette.github.io/)'s

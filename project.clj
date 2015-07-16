@@ -1,5 +1,5 @@
 (defproject contacts "0.3.0"
-  :description "Contact list technical study for Om next"
+  :description "Contact list technical study for Om Next"
   :url "https://github.com/tmarble/contacts"
   :license {:name "MIT"
             :url "http://opensource.org/licenses/MIT"}
