@@ -20,7 +20,7 @@
 /.lein-*
 
 # Editor artifacts
-.nrepl-port
+.repl
 *~
 
 ## Other

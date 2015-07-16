@@ -7,7 +7,43 @@
             ;; [cljs.core.async :as async :refer [<! >! chan]]
             [cljs.pprint :refer [pprint]]
             [om.next :as om :refer-macros [defui]]
-            [om.dom :as dom]))
+            [om.dom :as dom]
+            [datascript :as d]))
+
+(def ^:private schema {:app/contacts {:db/valueType :db.type/ref
+                                      :db/cardinality :db.cardinality/many}
+                       :person/address {:db/valueType :db.type/ref
+                                        :db/cardinality :db.cardinality/many}
+                       :person/telephone {:db/valueType :db.type/ref
+                                          :db/cardinality :db.cardinality/many}})
+
+(def conn (d/create-conn schema))
+
+(def fixtures [{:db/id -10 :telephone/number "111-111-1111"}
+               {:db/id -11 :telephone/number "111-111-1112"}
+               {:db/id -20
+                :address/street "Maple Street"
+                :address/city "Boston"
+                :address/state "Massachusetts"
+                :address/zipcode "11111"}
+               {:db/id -21
+                :address/street "Maple Street"
+                :address/city "Boston"
+                :address/state "Massachusetts"
+                :address/zipcode "11112"}
+               {:db/id -1
+                :person/first-name "Bob"
+                :person/last-name "Smith"
+                :person/telephone [-10]
+                :person/address [-20]}
+               {:db/id -2
+                :person/first-name "Martha",
+                :person/last-name "Smith"
+                :person/telephone [-11]
+                :person/address [-21]}
+               {:app/contacts [-1 -2]}])
+
+(d/transact! conn fixtures) 
 
 ;; (defn log [x]
 ;;   (println) ;; flush past prompt
@@ -20,21 +56,18 @@
 (defn fetch-contacts
   "Return simple, static contacts data (ignore the query)."
   [query]
-  {:app/contacts
-   [{:person/first-name "Bob",
-     :person/last-name "Smith"
-     :person/telephone [{:telephone/number "111-111-1111"}]
-     :person/address [{:address/street "Maple Street",
-                       :address/city "Boston",
-                       :address/state "Massachusetts",
-                       :address/zipcode "11111"}]}
-    {:person/first-name "Martha",
-     :person/last-name "Smith"
-     :person/telephone [{:telephone/number "111-111-1112"}]
-     :person/address [{:address/street "Maple Street",
-                       :address/city "Boston",
-                       :address/state "Massachusetts",
-                       :address/zipcode "11112"}]}]})
+  (ffirst
+    (d/q {:find '[(pull ?e ?q)]
+          :in '[$ ?q]
+          :where '[[?e :app/contacts]]}
+         @conn
+         query)))
+
+#_(ffirst (d/q {:find '[(pull ?e ?q)]
+                :in '[$ ?q]
+                :where '[[?e :app/contacts]]}
+               @conn
+               (om/get-query ContactList))) 
 
 (defn label+span
   "Construct a label and span (with optional opts)."
